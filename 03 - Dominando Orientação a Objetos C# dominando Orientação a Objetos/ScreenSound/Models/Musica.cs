@@ -17,12 +17,6 @@
         Console.WriteLine($"Nome: {Nome}");
         Console.WriteLine($"Artista: {Artista.Nome}");
         Console.WriteLine($"Duração: {Duracao}");
-        if (Disponivel)
-        {
-            Console.WriteLine("Disponível no plano.");
-        } else
-        {
-            Console.WriteLine("Adquira o plano Plus+");
-        }
+        Console.WriteLine(Disponivel ? "Disponível no plano." : "Adquira o plano Plus+.");
     }
 }

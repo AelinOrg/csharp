@@ -45,3 +45,62 @@ Namespaces são úteis para organizar o código-fonte e para evitar conflitos de no
 
 **Fully Qualified Name (FQN)**
 O nome totalmente qualificado de um tipo de dados inclui o nome do namespace. Por exemplo, o nome totalmente qualificado da classe `ArrayList` no namespace `System.Collections` é `System.Collections.ArrayList`.
+
+## Visibilidade internal
+O modificador `internal` é um modificador de acesso. Ele pode ser aplicado a classes e membros de classe. Um membro de classe com o modificador `internal` só pode ser acessado dentro do mesmo projeto (assembly). Um assembly é um arquivo executável ou uma biblioteca de classes. 
+
+```csharp
+internal class Musica
+{
+	// ...
+}
+
+```
+
+## Visibilidade estática
+São blocos de instrução que de alguma maneira estão relacionados ao tipo ao qual aquele método pertence, mas não utilizam nenhum dado ou outro método de objetos do tipo. Além de métodos estáticos, também podemos criar campos estáticos. Neste caso, o valor do campo está associado ao tipo e não ao objeto. Um cenário muito comum é armazenar constantes associadas àquele tipo.
+
+```csharp
+public class Musica
+{
+	public static void QuantidadeDeMusicas()
+	{
+		// ...
+	}
+}
+
+Musica.QuantidadeDeMusicas();
+```
+## Herança
+Um dos pilares da orientação a objetos é a herança. Ela permite que uma classe herde características de outra classe. A classe que herda é chamada de classe derivada ou subclasse. A classe que é herdada é chamada de classe base ou superclasse. 
+
+```csharp
+public class Musica
+{
+	public string Nome { get; set; }
+	public string Artista { get; set; }
+	public string Album { get; set; }
+	public string Genero { get; set; }
+	public int Ano { get; set; }
+
+	public void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista}");
+	}
+}
+
+public class MusicaFavorita : Musica
+{
+	public bool Favorita { get; set; }
+}
+
+MusicaFavorita musica = new MusicaFavorita();
+musica.Nome = "Astronaut In The Ocean";
+musica.Artista = "Masked Wolf";
+
+musica.Tocar();
+```
+
+A classe `MusicaFavorita` herda da classe `Musica`. Isso significa que a classe `MusicaFavorita`, por exemplo, pode usar a propriedade `Nome` ou o método `Tocar` da classe `Musica`, isto **se o membro for público**.
+
+Note que a sintaxe para herança é `class SubClasse : SuperClasse`.

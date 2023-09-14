@@ -104,3 +104,227 @@ musica.Tocar();
 A classe `MusicaFavorita` herda da classe `Musica`. Isso significa que a classe `MusicaFavorita`, por exemplo, pode usar a propriedade `Nome` ou o método `Tocar` da classe `Musica`, isto **se o membro for público**.
 
 Note que a sintaxe para herança é `class SubClasse : SuperClasse`.
+
+## Sobreposição de métodos
+A sobreposição de métodos é um recurso da linguagem que permite que uma classe derivada forneça uma implementação específica para um método que já está implementado em uma classe base. 
+
+```csharp
+public class Musica
+{
+	public string Nome { get; set; }
+	public string Artista { get; set; }
+	public string Album { get; set; }
+	public string Genero { get; set; }
+	public int Ano { get; set; }
+
+	public virtual void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista}");
+	}
+}
+
+public class MusicaFavorita : Musica
+{
+	public bool Favorita { get; set; }
+
+	public override void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista} (favorita)");
+	}
+}
+
+MusicaFavorita musica = new MusicaFavorita();
+musica.Nome = "Astronaut In The Ocean";
+musica.Artista = "Masked Wolf";
+
+musica.Tocar();
+```
+
+Como vemos, para que seja possível a sobreposição de métodos, é necessário usar o modificador `virtual` na classe base e o modificador `override` na classe derivada.
+
+Apesar de termos sobrescrito o método `Tocar` na classe `MusicaFavorita`, ainda é possível acessar o método `Tocar` da classe `Musica` usando a palavra-chave `base`.
+
+```csharp
+public class MusicaFavorita : Musica
+{
+	public bool Favorita { get; set; }
+
+	public override void Tocar()
+	{
+		base.Tocar();
+		Console.WriteLine($"Tocando {Nome} de {Artista} (favorita)");
+	}
+}
+```
+
+Na herança, classes ancestrais podem ter comportamentos substituídos ou sobrescritos por seus descendentes. Para indicar essa possibilidade, declaramos o membro no ancestral como virtual, e no descendente que for sobrescrevê-lo, marcamos o membro da classe com override. Se ainda assim quisermos executar a parte de código que estiver no ancestral, usamos a palavra reservada base.
+
+## Interfaces
+Uma interface é um tipo de referência semelhante a uma classe, mas que só pode conter declarações de membros abstratos e constantes. Não é possível criar uma instância de uma interface. Uma interface é implementada por uma classe ou struct. 
+
+```csharp
+internal interface IMusica
+{
+	string Nome { get; set; }
+	string Artista { get; set; }
+	string Album { get; set; }
+	string Genero { get; set; }
+	int Ano { get; set; }
+
+	void Tocar();
+}
+
+internal class Musica : IMusica
+{
+	public string Nome { get; set; }
+	public string Artista { get; set; }
+	public string Album { get; set; }
+	public string Genero { get; set; }
+	public int Ano { get; set; }
+
+	public void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista}");
+	}
+}
+
+internal class MusicaFavorita : IMusica
+{
+	public string Nome { get; set; }
+	public string Artista { get; set; }
+	public string Album { get; set; }
+	public string Genero { get; set; }
+	public int Ano { get; set; }
+	public bool Favorita { get; set; }
+
+	public void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista} (favorita)");
+	}
+}
+```
+
+A sintaxe para definir uma interface é `interface NomeDaInterface`. Ela define um contrato que deve ser implementado por uma classe ou struct. 
+
+Conforme aconselhado pela Microsoft, o nome de uma interface deve começar com a letra `I`.
+
+## Ancestral-raiz
+Usando um atalho do Visual Studio em que digitamos a palavra `override`, seguida de um espaço, resulta na apresentação de todos os métodos que podem ser sobrescritos. Neste momento, apareceram três métodos: `ToString()`, `GetHashCode()` e `Equals()`. Afinal, de onde vêm esses métodos?
+
+Na verdade, todas as classes herdam de um “ancestral-raiz”: a classe `Object`. Podemos dizer que objetos criados a partir de qualquer classe são `Object`. E é nessa classe que estão declarados esses três métodos.
+
+Para que serve cada um desses métodos?
+
+- O método `ToString()` pode ser utilizado para gerar uma representação textual do tipo cujo objeto pertence. A implementação padrão existente em `Object` somente imprime o nome do tipo. Podemos sobrescrever esse método para retornar um texto mais significativo.
+
+- O método `Equals()` retorna um valor booleano para indicar se o objeto é equivalente a outro passado como argumento do método. Podemos sobrescrever esse método para representar uma nova lógica de equivalência.
+
+- O método `GetHashCode()` é usado em conjunto com a sobrescrita de Equals(). Em algumas coleções, usamos um código hash para identificar o objeto no conjunto. Se a condição de igualdade for alterada, é preciso também alterar o código identificador para o objeto.
+- 
+## IEnumerable
+A interface `IEnumerable` é usada para fornecer uma maneira de iterar sobre uma coleção. Ela define um método `GetEnumerator()`, que retorna um objeto que implementa a interface `IEnumerator`. 
+
+Ela é útil quando queremos criar uma coleção que pode ser percorrida, mas não queremos expor a implementação da coleção ou permitir que a coleção seja modificada. 
+
+```csharp
+public class Musica
+{
+	public string Nome { get; set; }
+	public string Artista { get; set; }
+	public string Album { get; set; }
+	public string Genero { get; set; }
+	public int Ano { get; set; }
+
+	public void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista}");
+	}
+}
+
+public class Playlist : IEnumerable
+{
+	private List<Musica> _musicas = new List<Musica>();
+
+	public void Adicionar(Musica musica)
+	{
+		_musicas.Add(musica);
+	}
+
+	public IEnumerator GetEnumerator()
+	{
+		return _musicas.GetEnumerator();
+	}
+}
+
+Playlist playlist = new Playlist();
+playlist.Adicionar(new Musica { Nome = "Astronaut In The Ocean", Artista = "Masked Wolf" });
+playlist.Adicionar(new Musica { Nome = "Rapstar", Artista = "Polo G" });
+playlist.Adicionar(new Musica { Nome = "Save Your Tears", Artista = "The Weeknd" });
+
+foreach (Musica musica in playlist)
+{
+	musica.Tocar();
+}
+
+// ou 
+
+public class Playlist 
+{
+	private List<Musica> _musicas = new List<Musica>();
+	public IEnumerable<Musica> Musicas => _musicas;
+
+}
+```
+
+A classe `Playlist` implementa a interface `IEnumerable`. Isso significa que ela pode ser percorrida usando um `foreach`. 
+
+## Instalando uma biblioteca
+Para instalar uma biblioteca, primeiro precisamos nos certificar de que o projeto/solução está aberto no Visual Studio. Em seguida, clicamos com o botão direito na opção `Dependencies` e selecionamos a opção `Manage NuGet Packages...`. Em seguida, clicamos na aba `Browse` e pesquisamos pela biblioteca que queremos instalar. Por fim, clicamos no botão `Install`.
+
+Iremos utilizar a biblioteca `OpenAI` para gerar descrições de músicas.
+
+## Gerando descrições de músicas
+Para gerar descrições de músicas, importamos a biblioteca `OpenAI:
+
+```csharp
+using OpenAI_API;
+
+var client = new OpenAIClient("API_KEY");
+var chat = client.Chat.CreateConversation();
+
+chat.AppendSystemMessage("Você é um bot que gera descrições de músicas.");
+
+internal class Musica
+{
+	public string Nome { get; set; }
+	public string Artista { get; set; }
+	private string? _descricao;
+
+	public Musica Criar(Musica musica)
+	{
+		chat.AppendUserInput($"Gere uma descrição para a música {musica.Nome} de {musica.Artista}")
+		musica._descricao = chat.GetResponseFromChatbotAsync().GetAwaiter().GetResult();
+		_musicas.Add(musica);
+	}
+
+	/*public async Task<Musica> Criar(Musica musica)
+	{
+		chat.AppendUserInput($"Gere uma descrição para a música {musica.Nome} de {musica.Artista}")
+		musica._descricao = await chat.GetResponseFromChatbotAsync();
+		_musicas.Add(musica);
+	}*/
+
+	public void Tocar()
+	{
+		Console.WriteLine($"Tocando {Nome} de {Artista}\n");
+		Console.WriteLine(_descricao);
+	}
+}
+
+Musica musica = new Musica().Criar(new Musica { Nome = "Astronaut In The Ocean", Artista = "Masked Wolf" });
+musica.Tocar();
+```
+
+Note que, no método `Criar`, usamos o método `GetResponseFromChatbotAsync` para obter a descrição da música. Dentre as possibilidades, utilizamos o método `GetAwaiter` para aguardar a resposta do bot e o método `GetResult` para obter o resultado. Desta forma, não precisamos transformar o método `Criar` em `async` e nem usar o `await` para aguardar a resposta do bot.
+
+**Quando se trata de operações assíncronas, é recomendado utilizar o `async` e o `await` para aguardar o resultado.**
